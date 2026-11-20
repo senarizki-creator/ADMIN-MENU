@@ -986,6 +986,25 @@ Harap selesaikan (Invoice) unit tersebut terlebih dahulu sebelum menggunakan ${t
   }
   if (st === "Selesai" || st === "Invoice") r.selesai = now();
   saveRec(r);
+  
+  // Broadcast perubahan status ke Live Monitoring TV (jika pada browser yang sama)
+  try {
+    if ('BroadcastChannel' in window) {
+      const bc = new BroadcastChannel("sq_tv_channel");
+      bc.postMessage({
+        type: "status_change",
+        site: (r.site || activeSite || "").toUpperCase(),
+        id: r.id,
+        status: st,
+        stall: r.stall,
+        no_antrian: r.no_antrian,
+        plat: r.plat,
+        model: r.model
+      });
+      bc.close();
+    }
+  } catch(e) {}
+
   render();
 }
 
