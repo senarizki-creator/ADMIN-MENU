@@ -297,10 +297,12 @@ function getFormObj(containerId) {
 }
 
 /* Daftar Site dinamis (dimuat otomatis dari Sheet 'SITE') */
-let sites = ld("sq_sites", []);
+const DEFAULT_SITE = "JSL";
+let sites = ["JSL"];
 let sitePins = ld("sq_site_pins", {});
 let siteStalls = ld("sq_site_stalls", {});
-let activeSite = ld("sq_active_site", sites[0] || "");
+let activeSite = "JSL";
+sv("sq_active_site", "JSL");
 
 let recs = ld("sq_recs", []);
 let cfg = Object.assign({ stalls: 2, quota: 6, perDate: {}, url: SCRIPT_URL, siteQuotas: {} }, ld("sq_cfg", {}));
@@ -678,10 +680,8 @@ function applyServerData(j) {
   if (j.sites && Array.isArray(j.sites) && j.sites.length > 0) {
     sites = j.sites;
     sv("sq_sites", sites);
-    if (!activeSite || !sites.map(s => s.toUpperCase()).includes(activeSite.toUpperCase())) {
-      activeSite = (j.site || sites[0] || "").toUpperCase();
-      sv("sq_active_site", activeSite);
-    }
+    activeSite = "JSL";
+    sv("sq_active_site", "JSL");
     updateSiteBadges();
   }
 
@@ -1022,9 +1022,9 @@ function openLoginModal(k) {
   const curSite = (activeSite || (sites[0] || "")).toUpperCase();
 
   if (k === "sa") {
-    if (title) title.textContent = "Login Service Advisor - " + (curSite || "Pilih Cabang");
-    if (desc) desc.textContent = "Masukkan password cabang " + (curSite || "") + ":";
-    if (lblSite) lblSite.style.display = "block";
+    if (title) title.textContent = "Login Service Advisor - JSL";
+    if (desc) desc.textContent = "Masukkan password cabang JSL:";
+    if (lblSite) lblSite.style.display = "none";
   } else {
     if (title) title.textContent = "Login Administrator";
     if (desc) desc.textContent = "Masukkan PIN Administrator:";
@@ -1093,7 +1093,8 @@ function submitLogin() {
 
   const targetRole = pendingRoleTarget;
   const p = pinEl.value.trim();
-  const selectedSite = (siteEl && siteEl.value ? siteEl.value : activeSite).toUpperCase();
+  const selectedSite = "JSL";
+  activeSite = "JSL";
 
   let expectedPin = "";
   if (targetRole === "sa") {
@@ -1190,8 +1191,9 @@ function confirmSwitchSite() {
 }
 
 function updateSiteBadges() {
+  activeSite = "JSL";
   const txt = $("#siteBadgeTxt");
-  if (txt) txt.textContent = activeSite || "Pilih Cabang";
+  if (txt) txt.textContent = "JSL";
 }
 
 /* ===== MODAL KONFIRMASI BOOKING ===== */
@@ -1655,12 +1657,7 @@ function vSA() {
         <h2 style="margin:0">Service Advisor &middot; Cabang <span style="color:var(--red)">${esc(activeSite)}</span></h2>
         <span class="note">Kelola antrian khusus cabang ini</span>
       </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span class="note" style="font-weight:600">Pindah Cabang:</span>
-        <select style="width:auto;margin:0;padding:6px 12px;font-weight:700" onchange="switchSiteFromView(this.value)">
-          ${sites.map(s => `<option value="${s}" ${s.toUpperCase() === activeSite.toUpperCase() ? "selected" : ""}>${s}</option>`).join("")}
-        </select>
-      </div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="tag s-Hadir" style="font-size:13px;padding:4px 10px;">Cabang: <b>JSL</b> (Paten)</span></div>
     </div>
 
     <div class="card">
